@@ -1,0 +1,22 @@
+PODS:
+  - Masonry (1.0.0)
+  - MZPop (0.1.0):
+    - pop
+  - pop (1.0.9)
+
+DEPENDENCIES:
+  - Masonry
+  - MZPop (from `../`)
+
+EXTERNAL SOURCES:
+  MZPop:
+    :path: ../
+
+SPEC CHECKSUMS:
+  Masonry: b529bb169217897b6354d4b56b1fada6d475b13d
+  MZPop: 19dfbf994df5878041d125b7a24678d6e87cefa2
+  pop: f667631a5108a2e60d9e8797c9b32ddaf2080bce
+
+PODFILE CHECKSUM: ec22bb178caa9ff3b99502e0e453af4402d2be9a
+
+COCOAPODS: 1.0.0.beta.6

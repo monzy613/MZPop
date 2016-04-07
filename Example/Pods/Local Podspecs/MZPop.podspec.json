@@ -1,0 +1,25 @@
+{
+  "name": "MZPop",
+  "version": "0.1.0",
+  "summary": "Animation from facebook pop",
+  "description": "based on facebook pop",
+  "homepage": "https://github.com/monzy613/MZPop",
+  "license": "MIT",
+  "authors": {
+    "monzy613": "monzy613@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/monzy613/MZPop.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "7.0"
+  },
+  "requires_arc": true,
+  "source_files": "Pod/Classes/**/*",
+  "dependencies": {
+    "pop": [
+
+    ]
+  }
+}

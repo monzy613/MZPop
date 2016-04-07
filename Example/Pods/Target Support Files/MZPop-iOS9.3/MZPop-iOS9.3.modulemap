@@ -1,0 +1,6 @@
+framework module MZPop {
+  umbrella header "MZPop-iOS9.3-umbrella.h"
+
+  export *
+  module * { export * }
+}

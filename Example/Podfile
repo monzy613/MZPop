@@ -1,11 +1,12 @@
 source 'https://github.com/CocoaPods/Specs.git'
 use_frameworks!
 
-target 'MZPop_Example', :exclusive => true do
+target 'MZPop_Example' do
   pod 'MZPop', :path => '../'
+  pod 'Masonry'
 end
 
-target 'MZPop_Tests', :exclusive => true do
+target 'MZPop_Tests' do
   pod 'MZPop', :path => '../'
 
   
