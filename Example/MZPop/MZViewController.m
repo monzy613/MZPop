@@ -7,6 +7,8 @@
 //
 
 #import "MZViewController.h"
+#import "MZCodeViewController.h"
+#import "ShowCodeUnwindSegue.h"
 #import <Masonry/Masonry.h>
 #import "MZPop.h"
 #define codeViewLeftOffset 50.0
@@ -20,14 +22,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *rightLabel;
 @property (weak, nonatomic) IBOutlet UILabel *leftNumberLabel;
 @property (weak, nonatomic) IBOutlet UILabel *rightNumberLabel;
-@property (weak, nonatomic) IBOutlet UIButton *dismissButton;
-@property (nonatomic) UIView *codeView;
-@property (nonatomic) UITextView *codeTextView;
 @property (nonatomic) UIView *popBall;
 @property (nonatomic) UILabel *labelInBall;
 @property (nonatomic) NSArray<NSString *> *pickerTitles;
-@property (nonatomic) BOOL codeViewHidden;
-@property (nonatomic) CGAffineTransform initialTransform;
 @end
 
 @implementation MZViewController
@@ -35,12 +32,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.view.clipsToBounds = YES;
     [self.contentView addSubview:self.popBall];
-
-    [self.view addSubview:self.codeView];
-    [self.codeView addSubview:self.codeTextView];
-    [self setupConstraints];
-    self.initialTransform = self.view.transform;
     self.leftSlider.maximumValue = 15;
     self.leftSlider.minimumValue = 1;
     self.leftSlider.value = 5;
@@ -51,17 +44,30 @@
     self.rightNumberLabel.text = [NSString stringWithFormat:@" %.1f", 5.0f];
 }
 
-#pragma mark privates
-- (void)setupConstraints
+- (UIStoryboardSegue *)segueForUnwindingToViewController:(UIViewController *)toViewController fromViewController:(UIViewController *)fromViewController identifier:(NSString *)identifier
 {
-    [self.codeTextView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.codeView.mas_left).with.offset(codeViewLeftOffset / 2);
-        make.right.equalTo(self.codeView.mas_right);
-        make.top.equalTo(self.codeView.mas_top).with.offset(20);
-        make.bottom.equalTo(self.codeView.mas_bottom);
-    }];
+    if ([identifier isEqualToString:@"ShowCodeUnwindSegue"]) {
+        NSLog(@"ShowCodeUnwindSegue");
+        ShowCodeUnwindSegue *unwindSegue = [[ShowCodeUnwindSegue alloc] initWithIdentifier:@"ShowCodeUnwindSegue" source:fromViewController destination:toViewController];
+        return unwindSegue;
+    }
+    return [super segueForUnwindingToViewController:toViewController fromViewController:fromViewController identifier:identifier];
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"ShowCodeSegue"]) {
+        MZCodeViewController *codeVC = segue.destinationViewController;
+        codeVC.code = [NSString stringWithFormat:@"[MZPop springMove:self.popBall\nlocation:[self randomPoint]\nspringBounciness:%.1f\nspringSpeed:%.1f\ncompletion:nil];", self.leftSlider.value, self.rightSlider.value];
+    }
+}
+
+- (IBAction)returnFromSegueActions:(UIStoryboardSegue *)segue
+{
+    NSLog(@"ShowCodeUnwindSegue");
+}
+
+#pragma mark privates
 - (CGPoint)randomPoint
 {
     CGSize viewSize = self.contentView.bounds.size;
@@ -82,13 +88,13 @@
     return CGPointMake(x, y);
 }
 
-- (void)setCode
-{
-    NSString *selectedAnimation = self.pickerTitles[[self.animationPicker selectedRowInComponent:0]];
-    if ([selectedAnimation isEqualToString:@"springMove"]) {
-        self.codeTextView.text = [NSString stringWithFormat:@"[MZPop springMove:self.popBall\nlocation:[self randomPoint]\nspringBounciness:%.1f\nspringSpeed:%.1f\ncompletion:nil];", self.leftSlider.value, self.rightSlider.value];
-    }
-}
+//- (void)setCode
+//{
+//    NSString *selectedAnimation = self.pickerTitles[[self.animationPicker selectedRowInComponent:0]];
+//    if ([selectedAnimation isEqualToString:@"springMove"]) {
+//        self.codeTextView.text = [NSString stringWithFormat:@"[MZPop springMove:self.popBall\nlocation:[self randomPoint]\nspringBounciness:%.1f\nspringSpeed:%.1f\ncompletion:nil];", self.leftSlider.value, self.rightSlider.value];
+//    }
+//}
 
 
 #pragma mark button actions
@@ -145,42 +151,12 @@
 
 - (IBAction)showCode:(id)sender
 {
-    self.dismissButton.hidden = NO;
-    [self.view bringSubviewToFront:self.dismissButton];
-    [self setCode];
-    [self.view bringSubviewToFront:self.codeView];
-    [UIView animateWithDuration:0.3 animations:^{
-        self.view.transform = CGAffineTransformScale(self.initialTransform, 0.9, 0.9);
-    }];
-    self.codeViewHidden = NO;
-    CGPoint showCenter = CGPointMake((self.codeView.frame.size.width - codeViewLeftOffset) / 2, self.codeView.frame.size.height / 2);
-    [MZPop springMove:self.codeView
-             location:showCenter
-     springBounciness:5.0
-          springSpeed:8.0
-           completion:nil];
+    [self performSegueWithIdentifier:@"ShowCodeSegue" sender:self];
 }
 
 - (IBAction)showOptions:(id)sender
 {
-}
-
-- (IBAction)dismissAboveViews:(id)sender
-{
-    NSLog(@"dismissButtonPressed");
-    [UIView animateWithDuration:0.3 animations:^{
-        self.view.transform = CGAffineTransformScale(self.initialTransform, 1, 1);
-    }];
-    if (self.codeViewHidden == NO) {
-        self.codeViewHidden = YES;
-        CGPoint hideCenter = CGPointMake(-self.codeView.frame.size.width / 2, self.codeView.frame.size.height / 2);
-        [MZPop springMove:self.codeView
-                 location:hideCenter
-         springBounciness:5.0
-              springSpeed:5.0
-               completion:nil];
-    }
-    [sender setHidden:YES];
+    NSLog(@"showOptions");
 }
 
 #pragma mark slider actions
@@ -244,30 +220,4 @@
     }
     return _pickerTitles;
 }
-
-- (UIView *)codeView
-{
-    if (!_codeView) {
-        _codeViewHidden = YES;
-        CGFloat width = self.view.frame.size.width * 0.75;
-        _codeView = [[UIView alloc] initWithFrame:CGRectOffset(CGRectMake(0, 0, width, self.view.frame.size.height), -width, 0)];
-        _codeView.backgroundColor = [UIColor darkGrayColor];
-    }
-    return _codeView;
-}
-
-
-- (UITextView *)codeTextView
-{
-    if (!_codeTextView) {
-        NSLog(@"initCodeTextView");
-        _codeTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 200, 250)];
-        _codeTextView.font = [UIFont fontWithName:@"Menlo-Regular" size:15];
-        _codeTextView.textColor = [UIColor whiteColor];
-        _codeTextView.editable = NO;
-        _codeTextView.backgroundColor = [UIColor clearColor];
-    }
-    return _codeTextView;
-}
-
 @end
